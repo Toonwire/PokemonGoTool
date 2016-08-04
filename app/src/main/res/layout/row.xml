@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <TextView
+        android:id="@+id/tv_row_pokemon"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_column="0"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:padding="5dp"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:id="@+id/tv_row_transfer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_column="1"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:padding="5dp"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:id="@+id/tv_row_evolve"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_column="2"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:padding="5dp"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:id="@+id/tv_row_post_evo_transfer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_column="3"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:padding="5dp"
+        android:textSize="14sp"/>
+
+
+
+</TableRow>

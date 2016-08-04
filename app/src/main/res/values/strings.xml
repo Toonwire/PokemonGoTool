@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">PokemonGoTool</string>
+    <string name="settings">Settings</string>
+    <string name="search">Search</string>
+    <string name="user">User</string>
+    <string name="combat_power">CP</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="poke_tool">PokéTool</string>
+    <string name="nav_header_info">Optimizations for PokémonGO</string>
+    <string name="pokemon">Pokémon</string>
+    <string name="squirtle">Squirtle</string>
+    <string name="candy">#Candy</string>
+    <string name="pokemon_amount">#Pokémon</string>
+    <string name="candy_hint">201</string>
+    <string name="pokemon_amount_hint">16</string>
+    <string name="transfers">Transfers</string>
+    <string name="evolutions">Evolutions</string>
+    <string name="post_evolution_transfers">Post Evolution Transfers</string>
+    <string name="xp">XP</string>
+
+
+</resources>

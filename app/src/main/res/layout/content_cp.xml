@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".CombatPowerActivity"
+    tools:showIn="@layout/app_bar_cp">
+
+    <RelativeLayout
+        android:id="@+id/main_xp_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/primary">
+
+        <TextView
+            android:id="@+id/tv_xp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:paddingTop="30dp"
+            android:paddingBottom="30dp"
+            android:textSize="56sp"
+            android:textColor="@color/text_icons"
+            android:text="206-317"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/tv_xp"
+            android:layout_marginStart="10dp"
+            android:layout_alignBaseline="@+id/tv_xp"
+            android:textSize="18sp"
+            android:textColor="@color/text_icons"
+            android:text="CP"/>
+
+    </RelativeLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_anchor="@id/main_xp_layout"
+        app:layout_anchorGravity="bottom|right|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@mipmap/ic_fab_go_arrow"/>
+
+</android.support.design.widget.CoordinatorLayout>
