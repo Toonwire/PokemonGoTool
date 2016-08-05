@@ -1,10 +1,12 @@
 package com.toonwire.pokemongotool;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
+import android.animation.TypeEvaluator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
+import android.content.res.Resources;
+import android.graphics.drawable.TransitionDrawable;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -13,22 +15,21 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -47,10 +48,11 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
 
     private int totalXP;
     private double totalMinutes;
+    private ValueAnimator xpChangeAnimator;
 
-    private ListView listView;
     private ArrayList<PokemonData> dataList;
     private PokeAdapter pokeAdapter;
+    private int selectedRow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,16 +89,71 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
 
 
         dataList = new ArrayList<>();
-        pokeAdapter = new PokeAdapter(this, R.layout.row, dataList);
+        pokeAdapter = new PokeAdapter(this, R.layout.list_row, dataList);
 
-
-        listView = (ListView) findViewById(R.id.list_view);
+        ListView listView = (ListView) findViewById(R.id.list_view);
         ViewGroup headerView = (ViewGroup) getLayoutInflater().inflate(R.layout.list_header, listView, false);
         listView.addHeaderView(headerView);
         listView.setAdapter(pokeAdapter);
 
+        // animate the change in XP
+        xpChangeAnimator = new ValueAnimator();
+        xpChangeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            public void onAnimationUpdate(ValueAnimator animation) {
+                tvXP.setText(String.valueOf(animation.getAnimatedValue()));
+            }
+        });
+        xpChangeAnimator.setEvaluator(new TypeEvaluator<Integer>() {
+            public Integer evaluate(float fraction, Integer startValue, Integer endValue) {
+                return Math.round(startValue + (endValue - startValue) * fraction);
+            }
+        });
+        xpChangeAnimator.setDuration(1000);
+        xpChangeAnimator.setInterpolator(new DecelerateInterpolator());
 
 
+        // animate removal by sliding out from the list
+        final Animation slideOutAnimation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_out_right);
+        slideOutAnimation.setDuration(500);
+        slideOutAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                PokemonData dataRow = pokeAdapter.getItem(selectedRow);
+                // remove the long clicked (selected) row from the dataList and notify adapter of the change
+                dataList.remove(dataRow);
+                pokeAdapter.notifyDataSetChanged();
+
+                int tempTotalXP = totalXP;
+                // adjust the total xp and total time spent evolving
+                totalXP -= dataRow.getEvolutions()*1000;
+                totalMinutes -= ((double)dataRow.getEvolutions())/2;
+
+                xpChangeAnimator.setObjectValues(tempTotalXP, totalXP);
+                xpChangeAnimator.start();
+
+                showSnackbar(findViewById(android.R.id.content), getTimeSpentEvolving(), R.color.primary_dark);
+            }
+        });
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int pos, long id) {
+                selectedRow = pos-1;    // list view is 1-indexed, but the dataList (ArrayList) is 0-index
+                view.startAnimation(slideOutAnimation);
+
+                return true;
+            }
+        });
 
         new PokemonEvoLoader(this).execute("");
 
@@ -130,8 +187,7 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
         });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -191,8 +247,32 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
     }
 
     public void addPokemonDataRow() {
-        // adds a new row element to the listView
+        // store temp value of XP to animate the difference
+        int tempTotalXP = totalXP;
 
+        // get the optimized data row object
+        PokemonData dataRow = optimizeXP();
+
+        // adds a new row element to the listView
+        dataList.add(0, dataRow);
+        pokeAdapter.notifyDataSetChanged();
+
+        // update main xp view
+        xpChangeAnimator.setObjectValues(tempTotalXP, totalXP);
+        xpChangeAnimator.start();
+
+        // make snackbar to display time spent evolving
+        showSnackbar(findViewById(android.R.id.content), getTimeSpentEvolving(), R.color.primary_dark);
+
+        // reset edit texts
+        editAutoPokemon.setText("");
+        editCandy.setText("");
+        editPokemonAmount.setText("");
+        editAutoPokemon.requestFocus();
+
+    }
+
+    private PokemonData optimizeXP() {
         Pokemon pokemon = getPokemonFromName(editAutoPokemon.getText().toString());
         int candy = Integer.parseInt(editCandy.getText().toString());
         int numberOfPokemon = Integer.parseInt(editPokemonAmount.getText().toString());
@@ -202,9 +282,9 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
         int transfers = 0, evolutions = 0;
         int maxTransfers = numberOfPokemon - 1;
 
-        while (transfers + candyMissing <= maxTransfers
-                && evolutions < numberOfPokemon - transfers) {
+        while (transfers + candyMissing <= maxTransfers && evolutions < numberOfPokemon - transfers) {
             if (candyMissing > 0) {
+                candy = 0;
                 transfers += candyMissing;
                 candyMissing = candyNeeded;
             } else {
@@ -212,23 +292,31 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
                 candyMissing = candyNeeded - candy;
             }
             evolutions++;
+            maxTransfers--;
         }
+
         int finalEvolutions = evolutions;
-
-
-        int pokemonLeft = numberOfPokemon - transfers;
+        int pokemonLeft = numberOfPokemon - transfers - evolutions;
         int postEvoTransfers = 0;
 
         while (pokemonLeft > 0 && numberOfPokemon > evolutions && pokemonLeft + evolutions > candyMissing) {
             if (evolutions >= candyMissing) {
                 evolutions -= candyMissing;
                 postEvoTransfers += candyMissing;
-            } else if (evolutions + pokemonLeft > candyMissing) {
-                postEvoTransfers += evolutions;
-                transfers += candyMissing - evolutions;
-                pokemonLeft -= candyMissing + evolutions; // subtract what has just been transferred
-                evolutions = 0;
+            } else {    // we need to include the leftover pokemon
+                // this will prioritize transferring non-evolved before evolved pokemon
+                transfers += pokemonLeft - 1;
+                postEvoTransfers += candyMissing - (pokemonLeft - 1);
+                pokemonLeft = 0;
+
+                // this will prioritize transferring evolutions before non-evolved pokemon
+//                postEvoTransfers += evolutions;
+//                transfers += candyMissing - evolutions;
+//                pokemonLeft -= (candyMissing - evolutions); // subtract what has just been transferred
+//                evolutions = 0;
+
             }
+            evolutions++;
             finalEvolutions++;
             pokemonLeft--;
         }
@@ -237,31 +325,12 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
         double minutes = ((double)finalEvolutions)/2;    // if one evolution takes 30 sec
         int xp = finalEvolutions*1000;         // 1000xp with Lucky Egg per evolution
 
+        // add new xp and time to totals
         totalXP += xp;
         totalMinutes += minutes;
 
-
-        PokemonData row = new PokemonData(pokemon.getName(), transfers, finalEvolutions, postEvoTransfers);
-        dataList.add(0, row);
-        pokeAdapter.notifyDataSetChanged();
-
-        // update main xp view
-        tvXP.setText(String.valueOf(totalXP));
-
-        // make snackbar to display time spent evolving
-        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), getTimeSpentEvolving(), Snackbar.LENGTH_LONG).setAction("Action", null);
-        View snackBarView = snackbar.getView();
-        TextView tv = (TextView) snackBarView.findViewById(android.support.design.R.id.snackbar_text);
-        snackBarView.setBackgroundColor(ContextCompat.getColor(this, R.color.primary_dark));
-        tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        snackbar.show();
-
-        // reset edit texts
-        editAutoPokemon.setText("");
-        editCandy.setText("");
-        editPokemonAmount.setText("");
-        editAutoPokemon.requestFocus();
-
+        // return the data row object
+        return new PokemonData(pokemon.getName(), transfers, finalEvolutions, postEvoTransfers);
     }
 
     public String getTimeSpentEvolving() {
