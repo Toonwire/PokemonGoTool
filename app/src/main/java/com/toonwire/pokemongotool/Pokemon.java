@@ -58,4 +58,8 @@ public class Pokemon {
     public double getMaxMult() {
         return maxMult;
     }
+
+    public double getAvgMult() {
+        return avgMult;
+    }
 }

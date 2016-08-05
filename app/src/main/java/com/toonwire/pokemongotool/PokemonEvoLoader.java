@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.ListAdapter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,13 +22,12 @@ public class PokemonEvoLoader extends AsyncTask<String, String, ArrayList<Pokemo
     public static ArrayList<Pokemon> POKEMON_LIST = new ArrayList<>(150);
     public static String[] POKEMON_NAMES = new String[150];
 
-    private Activity mActivity;
-    private Context context;
+    private Context mContext;
 
     public PokemonEvoLoader(Context context) {
-        this.context = context;
-        mActivity = (Activity) context;
+        this.mContext = context;
     }
+
     // Runs in UI before background thread is called
     @Override
     protected void onPreExecute() {
@@ -39,7 +39,7 @@ public class PokemonEvoLoader extends AsyncTask<String, String, ArrayList<Pokemo
     protected ArrayList<Pokemon> doInBackground(String... params) {
 
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(context.getResources().getAssets().open("PokemonGo_evolution_data.csv")));
+            BufferedReader br = new BufferedReader(new InputStreamReader(mContext.getResources().getAssets().open("PokemonGo_evolution_data.csv")));
             LinkedList<Pokemon> pokeFamily = new LinkedList<>();
             int index = 0;
             String line;
@@ -85,12 +85,6 @@ public class PokemonEvoLoader extends AsyncTask<String, String, ArrayList<Pokemo
     protected void onPostExecute(ArrayList<Pokemon> result) {
         super.onPostExecute(result);
 
-        ArrayAdapter<String> nameAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, POKEMON_NAMES);
-
-        AutoCompleteTextView tvAutoSelectXP = ((ExperienceActivity) mActivity).getSelectView();
-//        AutoCompleteTextView tvAutoSelectCP = ((CombatPowerActivity) mActivity).getSelectView();
-        tvAutoSelectXP.setAdapter(nameAdapter);
-//        tvAutoSelectCP.setAdapter(nameAdapter);
-
     }
+
 }

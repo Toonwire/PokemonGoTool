@@ -4,8 +4,6 @@ import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -16,13 +14,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -30,6 +25,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -50,19 +46,21 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
     private double totalMinutes;
     private ValueAnimator xpChangeAnimator;
 
-    private ArrayList<PokemonData> dataList;
-    private PokeAdapter pokeAdapter;
+    private ArrayList<PokemonDataXP> dataList;
+    private ExperienceAdapter xpAdapter;
     private int selectedRow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_xp);
-
         mContext = getApplicationContext();
 
+        new PokemonEvoLoader(this).execute("");
+
         tvXP = (TextView) findViewById(R.id.tv_xp);
-        editAutoPokemon = (AutoCompleteTextView) findViewById(R.id.auto_edit_pokemon);
+        editAutoPokemon = (AutoCompleteTextView) findViewById(R.id.auto_edit_pokemon_xp);
+        editAutoPokemon.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, PokemonEvoLoader.POKEMON_NAMES));
         editAutoPokemon.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View view, int arg2, long arg3) {
@@ -89,12 +87,12 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
 
 
         dataList = new ArrayList<>();
-        pokeAdapter = new PokeAdapter(this, R.layout.list_row, dataList);
+        xpAdapter = new ExperienceAdapter(this, R.layout.list_row_xp, dataList);
 
-        ListView listView = (ListView) findViewById(R.id.list_view);
-        ViewGroup headerView = (ViewGroup) getLayoutInflater().inflate(R.layout.list_header, listView, false);
+        ListView listView = (ListView) findViewById(R.id.list_view_xp);
+        ViewGroup headerView = (ViewGroup) getLayoutInflater().inflate(R.layout.list_header_xp, listView, false);
         listView.addHeaderView(headerView);
-        listView.setAdapter(pokeAdapter);
+        listView.setAdapter(xpAdapter);
 
         // animate the change in XP
         xpChangeAnimator = new ValueAnimator();
@@ -128,10 +126,10 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                PokemonData dataRow = pokeAdapter.getItem(selectedRow);
+                PokemonDataXP dataRow = xpAdapter.getItem(selectedRow);
                 // remove the long clicked (selected) row from the dataList and notify adapter of the change
                 dataList.remove(dataRow);
-                pokeAdapter.notifyDataSetChanged();
+                xpAdapter.notifyDataSetChanged();
 
                 int tempTotalXP = totalXP;
                 // adjust the total xp and total time spent evolving
@@ -155,7 +153,6 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
             }
         });
 
-        new PokemonEvoLoader(this).execute("");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -164,7 +161,7 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         toolbar.setSubtitle("Experience optimizer");
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_add);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -251,11 +248,11 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
         int tempTotalXP = totalXP;
 
         // get the optimized data row object
-        PokemonData dataRow = optimizeXP();
+        PokemonDataXP dataRow = optimizeXP();
 
         // adds a new row element to the listView
         dataList.add(0, dataRow);
-        pokeAdapter.notifyDataSetChanged();
+        xpAdapter.notifyDataSetChanged();
 
         // update main xp view
         xpChangeAnimator.setObjectValues(tempTotalXP, totalXP);
@@ -272,7 +269,7 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
 
     }
 
-    private PokemonData optimizeXP() {
+    private PokemonDataXP optimizeXP() {
         Pokemon pokemon = getPokemonFromName(editAutoPokemon.getText().toString());
         int candy = Integer.parseInt(editCandy.getText().toString());
         int numberOfPokemon = Integer.parseInt(editPokemonAmount.getText().toString());
@@ -330,7 +327,7 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
         totalMinutes += minutes;
 
         // return the data row object
-        return new PokemonData(pokemon.getName(), transfers, finalEvolutions, postEvoTransfers);
+        return new PokemonDataXP(pokemon.getName(), transfers, finalEvolutions, postEvoTransfers);
     }
 
     public String getTimeSpentEvolving() {

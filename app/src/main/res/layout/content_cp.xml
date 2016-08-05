@@ -9,40 +9,144 @@
     tools:context=".CombatPowerActivity"
     tools:showIn="@layout/app_bar_cp">
 
+
     <RelativeLayout
-        android:id="@+id/main_xp_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/primary">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/tv_xp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:paddingTop="30dp"
-            android:paddingBottom="30dp"
-            android:textSize="56sp"
-            android:textColor="@color/text_icons"
-            android:text="206-317"/>
 
-        <TextView
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:id="@+id/main_cp_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/tv_xp"
-            android:layout_marginStart="10dp"
-            android:layout_alignBaseline="@+id/tv_xp"
-            android:textSize="18sp"
-            android:textColor="@color/text_icons"
-            android:text="CP"/>
+            android:background="@color/primary">
+
+            <RelativeLayout
+                android:id="@+id/cp_range_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true">
+
+                <TextView
+                    android:id="@+id/tv_cp_min"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="30dp"
+                    android:paddingBottom="30dp"
+                    android:textSize="56sp"
+                    android:textColor="@color/text_icons"
+                    android:text="0"/>
+
+                <TextView
+                    android:id="@+id/tv_range_dash"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/tv_cp_min"
+                    android:paddingTop="30dp"
+                    android:paddingBottom="30dp"
+                    android:textSize="56sp"
+                    android:textColor="@color/text_icons"
+                    android:text="-"/>
+
+                <TextView
+                    android:id="@+id/tv_cp_max"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/tv_range_dash"
+                    android:paddingTop="30dp"
+                    android:paddingBottom="30dp"
+                    android:textSize="56sp"
+                    android:textColor="@color/text_icons"
+                    android:text="0"/>
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/cp_range_layout"
+                android:layout_marginStart="10dp"
+                android:layout_alignBaseline="@+id/cp_range_layout"
+                android:textSize="18sp"
+                android:textColor="@color/text_icons"
+                android:text="@string/cp"/>
+
+        </RelativeLayout>
+
+
+        <LinearLayout
+            android:id="@+id/edit_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:paddingStart="@dimen/activity_horizontal_margin"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:layout_below="@+id/main_cp_layout">
+
+            <TextView
+                android:id="@+id/tv_pokemon_cp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="30sp"
+                android:text="@string/pokemon"
+                android:textColor="@color/secondary_text"/>
+
+            <AutoCompleteTextView
+                android:id="@+id/auto_edit_pokemon_cp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:inputType="textCapSentences"
+                android:textColor="@color/primary_text"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/activity_vertical_margin">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/combat_power"
+                    android:textSize="18sp"
+                    android:textColor="@color/secondary_text"/>
+
+                <EditText
+                    android:id="@+id/edit_cp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:inputType="number"
+                    android:textColor="@color/primary_text"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/list_view_cp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/edit_layout"
+            android:layout_marginTop="15dp" />
 
     </RelativeLayout>
 
+
+
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/fab_go"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_anchor="@id/main_xp_layout"
+        app:layout_anchor="@id/main_cp_layout"
         app:layout_anchorGravity="bottom|right|end"
         android:layout_margin="@dimen/fab_margin"
         android:src="@mipmap/ic_fab_go_arrow"/>

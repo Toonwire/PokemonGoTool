@@ -57,7 +57,7 @@
             android:layout_below="@+id/main_xp_layout">
 
             <TextView
-                android:id="@+id/tv_pokemon"
+                android:id="@+id/tv_pokemon_xp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="30sp"
@@ -65,7 +65,7 @@
                 android:textColor="@color/secondary_text"/>
 
             <AutoCompleteTextView
-                android:id="@+id/auto_edit_pokemon"
+                android:id="@+id/auto_edit_pokemon_xp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:maxLines="1"
@@ -132,7 +132,7 @@
 
 
         <ListView
-            android:id="@+id/list_view"
+            android:id="@+id/list_view_xp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/edit_layout"
@@ -141,7 +141,7 @@
     </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/fab_add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_anchor="@id/main_xp_layout"

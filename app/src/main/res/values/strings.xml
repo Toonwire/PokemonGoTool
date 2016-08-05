@@ -3,7 +3,8 @@
     <string name="settings">Settings</string>
     <string name="search">Search</string>
     <string name="user">User</string>
-    <string name="combat_power">CP</string>
+    <string name="cp">CP</string>
+    <string name="combat_power">Combat Power</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
