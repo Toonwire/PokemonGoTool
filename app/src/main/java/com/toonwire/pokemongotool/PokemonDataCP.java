@@ -6,12 +6,14 @@ import android.graphics.drawable.Drawable;
  * Created by Toonwire on 05-08-2016.
  */
 public class PokemonDataCP {
+    private Pokemon pokemon;
     private Drawable icon;
     private String name;
     private int cp;
 
-    public PokemonDataCP(String name, int cp, Drawable icon) {
-        this.name = name;
+    public PokemonDataCP(Pokemon pokemon, int cp, Drawable icon) {
+        this.pokemon = pokemon;
+        this.name = pokemon.getName();
         this.cp = cp;
         this.icon = icon;
     }
@@ -26,5 +28,9 @@ public class PokemonDataCP {
 
     public int getCP() {
         return cp;
+    }
+
+    public Pokemon getPokemon() {
+        return pokemon;
     }
 }

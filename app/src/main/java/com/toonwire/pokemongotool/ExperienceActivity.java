@@ -30,7 +30,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -41,6 +40,8 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
     private AutoCompleteTextView editAutoPokemon;
     private EditText editCandy, editPokemonAmount;
     private TextView tvXP;
+
+    private NavigationView navigationView;
 
     private int totalXP;
     private double totalMinutes;
@@ -60,7 +61,7 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
 
         tvXP = (TextView) findViewById(R.id.tv_xp);
         editAutoPokemon = (AutoCompleteTextView) findViewById(R.id.auto_edit_pokemon_xp);
-        editAutoPokemon.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, PokemonEvoLoader.POKEMON_NAMES));
+        editAutoPokemon.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, PokemonEvoLoader.POKEMON_NAMES));
         editAutoPokemon.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View view, int arg2, long arg3) {
@@ -93,6 +94,7 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
         ViewGroup headerView = (ViewGroup) getLayoutInflater().inflate(R.layout.list_header_xp, listView, false);
         listView.addHeaderView(headerView);
         listView.setAdapter(xpAdapter);
+        listView.setSelector(R.drawable.xp_data_selector);
 
         // animate the change in XP
         xpChangeAnimator = new ValueAnimator();
@@ -171,14 +173,14 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
                     Pokemon pokemon = getPokemonFromName(editAutoPokemon.getText().toString());
                     if (pokemon.isFullyEvolved()) {
                         String msg = pokemon.getName() + " is already fully evolved.\nNo experience can be gained through evolution";
-                        showSnackbar(view, msg, R.color.accent);
+                        showSnackbar(view, msg, R.color.error);
                     } else {
                         // add item to list
                         hideSoftKeyboard(view);
                         addPokemonDataRow();
                     }
                 } else {
-                    showSnackbar(view, "Fill required fields", R.color.accent);
+                    showSnackbar(view, "Fill required fields", R.color.error);
                 }
             }
         });
@@ -188,10 +190,18 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        navigationView.getMenu().getItem(0).setChecked(true);
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        navigationView.getMenu().getItem(0).setChecked(true);
+    }
+
 
     public void showSnackbar(View view, String msg, int colorID) {
         hideSoftKeyboard(view);
@@ -227,14 +237,12 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
         int id = item.getItemId();
 
         if (id == R.id.nav_xp) {
-            Toast.makeText(mContext, "XP clicked", Toast.LENGTH_SHORT).show();
 
         } else if (id == R.id.nav_cp) {
-            Toast.makeText(mContext, "CP clicked", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(ExperienceActivity.this, CombatPowerActivity.class));
+            overridePendingTransition(R.anim.pull_activity_in_right, R.anim.push_activity_out_left);
 
         } else if (id == R.id.nav_share) {
-            Toast.makeText(mContext, "Share clicked", Toast.LENGTH_SHORT).show();
 
         }
 
@@ -344,10 +352,6 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
             }
         }
         return pokemon;
-    }
-
-    public AutoCompleteTextView getSelectView() {
-        return editAutoPokemon;
     }
 
     private boolean isRequiredFilled() {

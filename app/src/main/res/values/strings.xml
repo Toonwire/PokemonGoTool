@@ -21,6 +21,8 @@
     <string name="evolutions">Evolutions</string>
     <string name="post_evolution_transfers">Post Evolution Transfers</string>
     <string name="xp">XP</string>
+    <string name="tv_row_cp_divider_candy">25 candy</string>
+    <string name="tv_row_cp_divider_multiplier">x2.8</string>
 
 
 </resources>

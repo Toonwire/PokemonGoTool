@@ -49,6 +49,11 @@ public class CombatPowerAdapter extends ArrayAdapter<Object>{
     }
 
     @Override
+    public boolean isEnabled(int position) {
+        return getItemViewType(position) == POKEMON_ROW;
+    }
+
+    @Override
     public int getViewTypeCount() {
         return ROW_TYPES.length;
     }
@@ -83,7 +88,8 @@ public class CombatPowerAdapter extends ArrayAdapter<Object>{
                     pokemonViewHolder = (PokemonViewHolder) convertView.getTag();
                 }
                 PokemonDataCP pokemonData = (PokemonDataCP) dataList.get(position);
-                String cp = position == 0 ? pokemonData.getCP() + " CP" : (pokemonData.getCP() + " CP (avg)");
+//                String cp = position == 0 ? pokemonData.getCP() + " CP" : (pokemonData.getCP() + " CP (avg)");
+                String cp = pokemonData.getCP() + " CP";
 
                 pokemonViewHolder.ivPokemon.setImageDrawable(pokemonData.getIcon());
                 pokemonViewHolder.tvName.setText(pokemonData.getName());

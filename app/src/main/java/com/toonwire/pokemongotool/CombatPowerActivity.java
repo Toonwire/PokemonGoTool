@@ -1,31 +1,24 @@
 package com.toonwire.pokemongotool;
 
-import android.animation.Animator;
-import android.animation.AnimatorSet;
-import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.animation.LinearOutSlowInInterpolator;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
+import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -35,7 +28,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -46,10 +38,12 @@ public class CombatPowerActivity extends AppCompatActivity implements Navigation
     private EditText editCP;
     private TextView tvMinCP, tvMaxCP;
 
+    private NavigationView navigationView;
+
     private ArrayList<Object> dataList;
     private CombatPowerAdapter cpAdapter;
 
-    private int minCP = 0, maxCP = 0;
+    private int initialCP = 0, minCP = 0, maxCP = 0;
     private ValueAnimator cpMinChangeAnimator, cpMaxChangeAnimator;
 
     @Override
@@ -62,7 +56,7 @@ public class CombatPowerActivity extends AppCompatActivity implements Navigation
         tvMinCP = (TextView) findViewById(R.id.tv_cp_min);
         tvMaxCP = (TextView) findViewById(R.id.tv_cp_max);
         editAutoPokemon = (AutoCompleteTextView) findViewById(R.id.auto_edit_pokemon_cp);
-        editAutoPokemon.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, PokemonEvoLoader.POKEMON_NAMES));
+        editAutoPokemon.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, PokemonEvoLoader.POKEMON_NAMES));
         editAutoPokemon.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View view, int arg2, long arg3) {
@@ -88,10 +82,42 @@ public class CombatPowerActivity extends AppCompatActivity implements Navigation
         dataList = new ArrayList<>();
         cpAdapter = new CombatPowerAdapter(this, R.layout.list_row_cp, dataList);
 
-        ListView listView = (ListView) findViewById(R.id.list_view_cp);
+        final ListView listView = (ListView) findViewById(R.id.list_view_cp);
         listView.setDivider(null);
         listView.setDividerHeight(0);
         listView.setAdapter(cpAdapter);
+        listView.setSelector(R.drawable.cp_data_selector);
+
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int pos, long id) {
+                int dataPosition = pos-1;     // list view click is 1-indexed, but the dataList (ArrayList) is 0-index
+
+                int newMinCP = initialCP;
+                int newMaxCP = initialCP;
+                for (int i = 0; i < dataPosition; i += 2) {     // i += 2 to skip INFO_ROWs
+                    newMinCP *= ((PokemonDataCP) dataList.get(i)).getPokemon().getMinMult();
+                    newMaxCP *= ((PokemonDataCP) dataList.get(i)).getPokemon().getMaxMult();
+                }
+                cpMinChangeAnimator.setObjectValues(minCP, newMinCP);
+                cpMaxChangeAnimator.setObjectValues(maxCP, newMaxCP);
+                cpMinChangeAnimator.start();
+                cpMaxChangeAnimator.start();
+                minCP = newMinCP;
+                maxCP = newMaxCP;
+
+                // reset all row item background colors
+                for (int i = 0; i < parent.getChildCount(); i++) {
+                    parent.getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
+                }
+                // then assign the long clicked view with the focus color
+                view.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cp_selected_background));
+
+                return true;
+            }
+        });
+
 
         // animate the change in CP
 
@@ -132,16 +158,16 @@ public class CombatPowerActivity extends AppCompatActivity implements Navigation
                     Pokemon pokemon = getPokemonFromName(editAutoPokemon.getText().toString());
                     if (pokemon.isFullyEvolved()) {
                         String msg = pokemon.getName() + " is already fully evolved.\nOnly Stardust will increase its combat power";
-                        showSnackbar(view, msg, R.color.accent);
+                        showSnackbar(view, msg, R.color.error);
                     } else {
                         hideSoftKeyboard(view);
-                        dataList.clear();
+                        dataList.clear();   // only show one family at a time, clear in between
+                        initialCP = Integer.parseInt(editCP.getText().toString());
 
                         // animate change in cp (first evolution)
                         int tempMinCP = minCP;
                         int tempMaxCP = maxCP;
 
-                        int initialCP = Integer.parseInt(editCP.getText().toString());
                         minCP = (int) (initialCP * pokemon.getMinMult());
                         maxCP = (int) (initialCP * pokemon.getMaxMult());
                         cpMinChangeAnimator.setObjectValues(tempMinCP, minCP);
@@ -152,9 +178,19 @@ public class CombatPowerActivity extends AppCompatActivity implements Navigation
                         // add items to list
                         addPokemonDataRows(initialCP);
 
+                        /*
+                         * post as runnable to queue the execution 'till after the adapter has
+                         * updated the list view, then mark next evolution as selected.
+                         */
+                        listView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                listView.getChildAt(2).setBackground(ContextCompat.getDrawable(mContext, R.drawable.cp_selected_background));
+                            }
+                        });
                     }
                 } else {
-                    showSnackbar(view, "Fill required fields", R.color.accent);
+                    showSnackbar(view, "Fill required fields", R.color.error);
                 }
             }
         });
@@ -165,8 +201,16 @@ public class CombatPowerActivity extends AppCompatActivity implements Navigation
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        navigationView.getMenu().getItem(1).setChecked(true);
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        navigationView.getMenu().getItem(1).setChecked(true);
     }
 
     public void showSnackbar(View view, String msg, int colorID) {
@@ -185,10 +229,10 @@ public class CombatPowerActivity extends AppCompatActivity implements Navigation
 
         // add pokemon and all its evolutions as data row objects and add them to the list view
         for (int i = familyIndex; i < pokemon.getFamily().size(); i++) {
-            if (i != familyIndex)   // only add in between info data
+            if (i != familyIndex)   // only add pokemon in between info data, so ignore the first iteration
                 dataList.add(new InfoDataCP(pokemon.getFamily().get(i-1).getCandyNeeded(), pokemon.getFamily().get(i-1).getAvgMult()));
 
-            dataList.add(new PokemonDataCP(pokemon.getFamily().get(i).getName(), cp, getPokemonIcon(pokemon.getFamily().get(i))));
+            dataList.add(new PokemonDataCP(pokemon.getFamily().get(i), cp, getPokemonIcon(pokemon.getFamily().get(i))));
             cp = (int) (cp * pokemon.getFamily().get(i).getAvgMult());
 
         }
@@ -231,8 +275,8 @@ public class CombatPowerActivity extends AppCompatActivity implements Navigation
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
+//        int id = item.getItemId();
+//
 //        if (id == R.id.action_cp) {
 //            Toast.makeText(mContext, "CP clicked", Toast.LENGTH_SHORT).show();
 //            return true;
@@ -251,25 +295,18 @@ public class CombatPowerActivity extends AppCompatActivity implements Navigation
         int id = item.getItemId();
 
         if (id == R.id.nav_cp) {
-            Toast.makeText(mContext, "CP clicked", Toast.LENGTH_SHORT).show();
 
         } else if (id == R.id.nav_xp) {
-            Toast.makeText(mContext, "XP clicked", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(CombatPowerActivity.this, ExperienceActivity.class));
+            overridePendingTransition(R.anim.pull_activity_in_left, R.anim.push_activity_out_right);
 
         } else if (id == R.id.nav_share) {
-            Toast.makeText(mContext, "Share clicked", Toast.LENGTH_SHORT).show();
 
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-
-    public AutoCompleteTextView getSelectView() {
-        return editAutoPokemon;
     }
 
     private boolean isRequiredFilled() {
