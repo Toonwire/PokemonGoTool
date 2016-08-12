@@ -8,6 +8,6 @@
     <color name="secondary_text">#727272</color>
     <color name="text_icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
-    <color name="error">#D50000</color>
+    <color name="error">#F44336</color>
 </resources>    
 

@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- run transition if being pressed while not having focus -->
+    <item
+        android:state_focused="false"
+        android:state_pressed="true" android:drawable="@drawable/list_selector_background_transition_remove" />
 </selector>

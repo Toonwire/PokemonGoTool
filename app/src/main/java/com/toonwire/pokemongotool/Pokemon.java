@@ -62,4 +62,5 @@ public class Pokemon {
     public double getAvgMult() {
         return avgMult;
     }
+
 }

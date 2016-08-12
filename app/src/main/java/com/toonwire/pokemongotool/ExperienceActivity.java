@@ -14,6 +14,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,7 +34,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class ExperienceActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class ExperienceActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, PokemonEvoLoader.AsyncTaskCompleteListener<String[]> {
 
     private Context mContext;
 
@@ -57,11 +58,10 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
         setContentView(R.layout.activity_xp);
         mContext = getApplicationContext();
 
-        new PokemonEvoLoader(this).execute("");
+        new PokemonEvoLoader(mContext, this).execute("");
 
         tvXP = (TextView) findViewById(R.id.tv_xp);
         editAutoPokemon = (AutoCompleteTextView) findViewById(R.id.auto_edit_pokemon_xp);
-        editAutoPokemon.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, PokemonEvoLoader.POKEMON_NAMES));
         editAutoPokemon.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View view, int arg2, long arg3) {
@@ -363,5 +363,10 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
     private void hideSoftKeyboard(View v) {
         InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         in.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
+    }
+
+    @Override
+    public void onTaskComplete(String[] result) {
+        editAutoPokemon.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, result));
     }
 }

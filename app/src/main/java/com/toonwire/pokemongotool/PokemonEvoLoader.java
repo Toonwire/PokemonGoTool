@@ -13,19 +13,17 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-
-/**
- * Created by Toonwire on 25-07-2016.
- */
 public class PokemonEvoLoader extends AsyncTask<String, String, ArrayList<Pokemon>> {
     // Initialize the Set size to avoid resizing
     public static ArrayList<Pokemon> POKEMON_LIST = new ArrayList<>(150);
     public static String[] POKEMON_NAMES = new String[150];
 
     private Context mContext;
+    private AsyncTaskCompleteListener<String[]> callback;
 
-    public PokemonEvoLoader(Context context) {
+    public PokemonEvoLoader(Context context, AsyncTaskCompleteListener<String[]> callback) {
         this.mContext = context;
+        this.callback = callback;
     }
 
     // Runs in UI before background thread is called
@@ -59,6 +57,7 @@ public class PokemonEvoLoader extends AsyncTask<String, String, ArrayList<Pokemo
                     double minMult = Double.parseDouble(data[2].substring(0, data[2].length()-1));
                     double maxMult = Double.parseDouble(data[3].substring(0, data[3].length()-1));
                     double avgMult = Double.parseDouble(data[4].substring(0, data[4].length()-1));
+
                     pokemon = new Pokemon(name, candyNeeded, minMult, maxMult, avgMult);
                     pokeFamily.add(pokemon);
 
@@ -84,7 +83,11 @@ public class PokemonEvoLoader extends AsyncTask<String, String, ArrayList<Pokemo
     @Override
     protected void onPostExecute(ArrayList<Pokemon> result) {
         super.onPostExecute(result);
+        callback.onTaskComplete(POKEMON_NAMES);
 
     }
 
+    interface AsyncTaskCompleteListener<T> {
+        public void onTaskComplete(T result);
+    }
 }

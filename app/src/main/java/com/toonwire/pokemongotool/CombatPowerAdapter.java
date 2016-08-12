@@ -117,46 +117,7 @@ public class CombatPowerAdapter extends ArrayAdapter<Object>{
                 break;
 
         }
-
         return convertView;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//        if (convertView == null) {
-//            convertView = mInflater.inflate(resourceID, parent, false);
-//
-//            pokemonViewHolder = new PokemonViewHolder();
-//            pokemonViewHolder.ivPokemon = (ImageView) convertView.findViewById(R.id.iv_ic_pokemon);
-//            pokemonViewHolder.tvName = (TextView) convertView.findViewById(R.id.tv_row_pokemon_name);
-//            pokemonViewHolder.tvIndividualCP = (TextView) convertView.findViewById(R.id.tv_row_cp);
-//
-//            convertView.setTag(holder);
-//
-//        } else {
-//            holder = (PokemonViewHolder) convertView.getTag();
-//        }
-//
-//        PokemonDataCP data = dataList.get(position);
-//        String cp = position == 0 ? data.getCP() + " CP" : (data.getCP() + " CP (avg)");
-//
-//        holder.ivPokemon.setImageDrawable(data.getIcon());
-//        holder.tvName.setText(data.getName());
-//        holder.tvIndividualCP.setText(cp);
-//
-//        return convertView;
     }
 
     // static reference object to minimize findViewById() and inflater calls

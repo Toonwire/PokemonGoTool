@@ -52,7 +52,6 @@ public class CombatPowerActivity extends AppCompatActivity implements Navigation
         setContentView(R.layout.activity_cp);
         mContext = getApplicationContext();
 
-
         tvMinCP = (TextView) findViewById(R.id.tv_cp_min);
         tvMaxCP = (TextView) findViewById(R.id.tv_cp_max);
         editAutoPokemon = (AutoCompleteTextView) findViewById(R.id.auto_edit_pokemon_cp);
