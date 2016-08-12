@@ -184,6 +184,9 @@ public class CombatPowerActivity extends AppCompatActivity implements Navigation
                         listView.post(new Runnable() {
                             @Override
                             public void run() {
+                                for (int i = 0; i < listView.getChildCount(); i++) {
+                                    listView.getChildAt(i).setBackground(ContextCompat.getDrawable(mContext, android.R.color.transparent));
+                                }
                                 listView.getChildAt(2).setBackground(ContextCompat.getDrawable(mContext, R.drawable.cp_selected_background));
                             }
                         });
@@ -224,16 +227,30 @@ public class CombatPowerActivity extends AppCompatActivity implements Navigation
 
     public void addPokemonDataRows(int cp) {
         Pokemon pokemon = getPokemonFromName(editAutoPokemon.getText().toString());
-        int familyIndex = pokemon.getFamilyIndex();
 
-        // add pokemon and all its evolutions as data row objects and add them to the list view
-        for (int i = familyIndex; i < pokemon.getFamily().size(); i++) {
-            if (i != familyIndex)   // only add pokemon in between info data, so ignore the first iteration
-                dataList.add(new InfoDataCP(pokemon.getFamily().get(i-1).getCandyNeeded(), pokemon.getFamily().get(i-1).getAvgMult()));
+        // handle special case for Eevee - multiple evolutions
+        if (pokemon.getName().startsWith("Eevee")) {
+            Pokemon eevee = new Pokemon("Eevee", pokemon.getCandyNeeded(), pokemon.getMinMult(), pokemon.getMaxMult(), pokemon.getAvgMult());
+            dataList.add(new PokemonDataCP(eevee, cp, getPokemonIcon(eevee)));
+            cp = (int) (cp * eevee.getAvgMult());
+            dataList.add(new InfoDataCP(eevee.getCandyNeeded(), eevee.getAvgMult()));
 
-            dataList.add(new PokemonDataCP(pokemon.getFamily().get(i), cp, getPokemonIcon(pokemon.getFamily().get(i))));
-            cp = (int) (cp * pokemon.getFamily().get(i).getAvgMult());
+            // get the evolution name : "Eevee -> " = 9 length
+            Pokemon eeveeEvolution = new Pokemon(pokemon.getName().substring(9));
+            dataList.add(new PokemonDataCP(eeveeEvolution, cp, getPokemonIcon(eeveeEvolution)));
 
+        } else {
+            int familyIndex = pokemon.getFamilyIndex();
+
+            // add pokemon and all its evolutions as data row objects and add them to the list view
+            for (int i = familyIndex; i < pokemon.getFamily().size(); i++) {
+                if (i != familyIndex)   // only add pokemon in between info data, so ignore the first iteration
+                    dataList.add(new InfoDataCP(pokemon.getFamily().get(i - 1).getCandyNeeded(), pokemon.getFamily().get(i - 1).getAvgMult()));
+
+                dataList.add(new PokemonDataCP(pokemon.getFamily().get(i), cp, getPokemonIcon(pokemon.getFamily().get(i))));
+                cp = (int) (cp * pokemon.getFamily().get(i).getAvgMult());
+
+            }
         }
         cpAdapter.notifyDataSetChanged();
 
