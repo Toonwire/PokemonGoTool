@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="40dp">
+
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_column="0"
+        android:layout_weight="1"/>
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_column="1"
+        android:layout_weight="2">
+
+        <View
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:background="@color/divider" />
+
+        <View
+            android:id="@+id/pin"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_centerInParent="true"
+            android:background="@mipmap/pokeball_transparent" />
+        
+        <TextView
+            android:id="@+id/tv_row_pokemon_candy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/pin"
+            android:layout_centerVertical="true"
+            android:textColor="@color/divider"
+            android:textStyle="italic"
+            android:textSize="14sp"
+            android:layout_marginStart="8dp"
+            android:text="@string/tv_row_cp_divider_candy"/>
+        
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_column="1"
+        android:layout_weight="2">
+        <View
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:background="@color/divider" />
+
+        <View
+            android:id="@+id/pin2"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_centerInParent="true"
+            android:background="@mipmap/pokeball_transparent" />
+
+        <TextView
+            android:id="@+id/tv_row_cp_multiplier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/pin2"
+            android:layout_centerInParent="true"
+            android:textColor="@color/divider"
+            android:textSize="14sp"
+            android:textStyle="italic"
+            android:layout_marginStart="8dp"
+            android:text="@string/tv_row_cp_divider_multiplier"/>
+
+    </RelativeLayout>
+
+
+</TableRow>
