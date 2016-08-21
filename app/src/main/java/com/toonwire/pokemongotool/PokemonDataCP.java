@@ -2,9 +2,6 @@ package com.toonwire.pokemongotool;
 
 import android.graphics.drawable.Drawable;
 
-/**
- * Created by Toonwire on 05-08-2016.
- */
 public class PokemonDataCP {
     private Pokemon pokemon;
     private Drawable icon;

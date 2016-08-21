@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableRow
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -13,7 +11,6 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_weight="1"
-        android:padding="5dp"
         android:textStyle="bold"
         android:text=""/>
 
@@ -23,7 +20,6 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_weight="1"
-        android:padding="5dp"
         android:textStyle="bold"
         android:text="@string/transfers"/>
 
@@ -33,7 +29,6 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_weight="1"
-        android:padding="5dp"
         android:textStyle="bold"
         android:text="@string/evolutions"/>
 
@@ -43,7 +38,6 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_weight="1"
-        android:padding="5dp"
         android:textStyle="bold"
         android:text="@string/post_evolution_transfers"/>
 

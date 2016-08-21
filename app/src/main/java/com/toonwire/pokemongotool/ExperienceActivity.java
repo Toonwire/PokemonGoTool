@@ -2,8 +2,11 @@ package com.toonwire.pokemongotool;
 
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -19,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
@@ -33,7 +37,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class ExperienceActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, PokemonEvoLoader.AsyncTaskCompleteListener<String[]> {
+public class ExperienceActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, PokemonAsyncLoader.AsyncTaskCompleteListener<String[]> {
 
     private Context mContext;
 
@@ -54,10 +58,12 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
         setContentView(R.layout.activity_xp);
         mContext = getApplicationContext();
 
-        new PokemonEvoLoader(mContext, this).execute("");
+        new PokemonAsyncLoader(mContext, this).execute("");
 
         tvXP = (TextView) findViewById(R.id.tv_xp);
         editAutoPokemon = (AutoCompleteTextView) findViewById(R.id.auto_edit_pokemon_xp);
@@ -154,7 +160,6 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
             }
         });
 
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -201,7 +206,6 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
         navigationView.getMenu().getItem(0).setChecked(true);
     }
 
-
     public void showSnackbar(View view, String msg, int colorID) {
         hideSoftKeyboard(view);
         Snackbar snackbar = Snackbar.make(view, msg, Snackbar.LENGTH_LONG).setAction("Action", null);
@@ -242,7 +246,33 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
             overridePendingTransition(R.anim.pull_activity_in_right, R.anim.push_activity_out_left);
 
         } else if (id == R.id.nav_share) {
+            Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+            sharingIntent.setType("text/plain");
+            String shareBody = "Check out this app!\nhttp://play.google.com/store/apps/details?id=" + this.getPackageName();
+            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Look what I found");
+            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+            startActivity(Intent.createChooser(sharingIntent, "Share via"));
 
+        } else if (id == R.id.nav_rate) {
+            Uri uri = Uri.parse("market://details?id=" + this.getPackageName());
+            Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+            // To count with Play market backstack, After pressing back button,
+            // to taken back to our application, we need to add following flags to intent.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                        Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                        Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+            else
+                goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                        Intent.FLAG_ACTIVITY_MULTIPLE_TASK |
+                        Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+
+            try {
+                startActivity(goToMarket);
+            } catch (ActivityNotFoundException e) {
+                startActivity(new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("http://play.google.com/store/apps/details?id=" + this.getPackageName())));
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -307,6 +337,7 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
             if (evolutions >= candyMissing) {
                 evolutions -= candyMissing;
                 postEvoTransfers += candyMissing;
+
             } else {    // we need to include the leftover pokemon
                 // this will prioritize transferring non-evolved before evolved pokemon
                 transfers += pokemonLeft - 1;
@@ -327,7 +358,7 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
 
 
         double minutes = ((double)finalEvolutions)/2;    // if one evolution takes 30 sec
-        int xp = finalEvolutions*1000;         // 1000xp with Lucky Egg per evolution
+        int xp = finalEvolutions*1000;                   // 1000xp with Lucky Egg per evolution
 
         // add new xp and time to totals
         totalXP += xp;
@@ -347,8 +378,8 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
     public Pokemon getPokemonFromName(String name) {
         Pokemon pokemon = null;
 
-        for (Pokemon p : PokemonEvoLoader.POKEMON_LIST) {
-            if (p.getName().equals(name)) {
+        for (Pokemon p : PokemonAsyncLoader.POKEMON_LIST) {
+            if (p.getName().equalsIgnoreCase(name)) {
                 pokemon = p;
                 break;
             }
@@ -357,7 +388,7 @@ public class ExperienceActivity extends AppCompatActivity implements NavigationV
     }
 
     private boolean isRequiredFilled() {
-        return PokemonEvoLoader.POKEMON_LIST.contains(getPokemonFromName(editAutoPokemon.getText().toString()))
+        return PokemonAsyncLoader.POKEMON_LIST.contains(getPokemonFromName(editAutoPokemon.getText().toString()))
                 && !editPokemonAmount.getText().toString().isEmpty()
                 && !editCandy.getText().toString().isEmpty();
     }

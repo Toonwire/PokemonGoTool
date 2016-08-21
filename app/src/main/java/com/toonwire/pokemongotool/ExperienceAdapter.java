@@ -1,8 +1,6 @@
 package com.toonwire.pokemongotool;
 
 import android.app.Activity;
-import android.graphics.Color;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,20 +9,14 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-/**
- * Created by Toonwire on 03-08-2016.
- */
 public class ExperienceAdapter extends ArrayAdapter<PokemonDataXP> {
 
-    private Activity context;
     private int resourceID;
-
     private ArrayList<PokemonDataXP> dataList;
     private LayoutInflater mInflater;
 
     public ExperienceAdapter(Activity context, int resource, ArrayList<PokemonDataXP> items) {
         super(context, resource, items);
-        this.context = context;
         this.resourceID = resource;
         this.dataList = items;
         this.mInflater = context.getLayoutInflater();

@@ -1,8 +1,5 @@
 package com.toonwire.pokemongotool;
 
-/**
- * Created by Toonwire on 06-08-2016.
- */
 public class InfoDataCP {
     private int candy;
     private double avgMultiplier;

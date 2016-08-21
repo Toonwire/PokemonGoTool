@@ -1,11 +1,7 @@
 package com.toonwire.pokemongotool;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.ListAdapter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,7 +9,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class PokemonEvoLoader extends AsyncTask<String, String, ArrayList<Pokemon>> {
+public class PokemonAsyncLoader extends AsyncTask<String, String, ArrayList<Pokemon>> {
     // Initialize the Set size to avoid resizing
     public static ArrayList<Pokemon> POKEMON_LIST = new ArrayList<>(150);
     public static String[] POKEMON_NAMES = new String[150];
@@ -21,7 +17,7 @@ public class PokemonEvoLoader extends AsyncTask<String, String, ArrayList<Pokemo
     private Context mContext;
     private AsyncTaskCompleteListener<String[]> callback;
 
-    public PokemonEvoLoader(Context context, AsyncTaskCompleteListener<String[]> callback) {
+    public PokemonAsyncLoader(Context context, AsyncTaskCompleteListener<String[]> callback) {
         this.mContext = context;
         this.callback = callback;
     }
@@ -88,6 +84,6 @@ public class PokemonEvoLoader extends AsyncTask<String, String, ArrayList<Pokemo
     }
 
     interface AsyncTaskCompleteListener<T> {
-        public void onTaskComplete(T result);
+        void onTaskComplete(T result);
     }
 }

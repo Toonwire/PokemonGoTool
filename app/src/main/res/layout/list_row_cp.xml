@@ -38,6 +38,4 @@
         android:textColor="@color/primary_text"
         android:textSize="14sp"/>
 
-
-
 </TableRow>

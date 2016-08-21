@@ -1,10 +1,13 @@
 package com.toonwire.pokemongotool;
 
 import android.animation.ValueAnimator;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -55,7 +58,7 @@ public class CombatPowerActivity extends AppCompatActivity implements Navigation
         tvMinCP = (TextView) findViewById(R.id.tv_cp_min);
         tvMaxCP = (TextView) findViewById(R.id.tv_cp_max);
         editAutoPokemon = (AutoCompleteTextView) findViewById(R.id.auto_edit_pokemon_cp);
-        editAutoPokemon.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, PokemonEvoLoader.POKEMON_NAMES));
+        editAutoPokemon.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, PokemonAsyncLoader.POKEMON_NAMES));
         editAutoPokemon.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View view, int arg2, long arg3) {
@@ -287,25 +290,6 @@ public class CombatPowerActivity extends AppCompatActivity implements Navigation
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        if (id == R.id.action_cp) {
-//            Toast.makeText(mContext, "CP clicked", Toast.LENGTH_SHORT).show();
-//            return true;
-//        } else if (id == R.id.action_xp) {
-//            Toast.makeText(mContext, "XP clicked", Toast.LENGTH_SHORT).show();
-//            startActivity(new Intent(CombatPowerActivity.this, ExperienceActivity.class));
-//            return true;
-//        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
@@ -317,7 +301,34 @@ public class CombatPowerActivity extends AppCompatActivity implements Navigation
             overridePendingTransition(R.anim.pull_activity_in_left, R.anim.push_activity_out_right);
 
         } else if (id == R.id.nav_share) {
+            Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+            sharingIntent.setType("text/plain");
+            String shareBody = "Check out this app!\nhttp://play.google.com/store/apps/details?id=" + this.getPackageName();
+            sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Look what I found");
+            sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+            startActivity(Intent.createChooser(sharingIntent, "Share via"));
 
+
+        } else if (id == R.id.nav_rate) {
+            Uri uri = Uri.parse("market://details?id=" + this.getPackageName());
+            Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+            // To count with Play market backstack, After pressing back button,
+            // to taken back to our application, we need to add following flags to intent.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                        Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                        Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+            else
+                goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                        Intent.FLAG_ACTIVITY_MULTIPLE_TASK |
+                        Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+
+            try {
+                startActivity(goToMarket);
+            } catch (ActivityNotFoundException e) {
+                startActivity(new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("http://play.google.com/store/apps/details?id=" + this.getPackageName())));
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -326,14 +337,14 @@ public class CombatPowerActivity extends AppCompatActivity implements Navigation
     }
 
     private boolean isRequiredFilled() {
-        return PokemonEvoLoader.POKEMON_LIST.contains(getPokemonFromName(editAutoPokemon.getText().toString()))
+        return PokemonAsyncLoader.POKEMON_LIST.contains(getPokemonFromName(editAutoPokemon.getText().toString()))
                 && !editCP.getText().toString().isEmpty();
     }
 
     public Pokemon getPokemonFromName(String name) {
         Pokemon pokemon = null;
 
-        for (Pokemon p : PokemonEvoLoader.POKEMON_LIST) {
+        for (Pokemon p : PokemonAsyncLoader.POKEMON_LIST) {
             if (p.getName().equals(name)) {
                 pokemon = p;
                 break;

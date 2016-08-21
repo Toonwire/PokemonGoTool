@@ -5,19 +5,23 @@
         <item
             android:id="@+id/nav_xp"
             android:icon="@mipmap/ic_xp_text"
-            android:title="Experience optimizer" />
+            android:title="@string/experience_optimizer" />
         <item
             android:id="@+id/nav_cp"
             android:icon="@mipmap/ic_cp_text"
-            android:title="Combat Power calculator" />
+            android:title="@string/combat_power_calculator" />
     </group>
 
-    <item android:title="Show your friends!">
+    <item android:title="@string/show_your_friends">
         <menu>
             <item
                 android:id="@+id/nav_share"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
+                android:title="@string/share" />
+            <item
+                android:id="@+id/nav_rate"
+                android:icon="@drawable/ic_menu_rate"
+                android:title="@string/rate_this_app" />
         </menu>
     </item>
 

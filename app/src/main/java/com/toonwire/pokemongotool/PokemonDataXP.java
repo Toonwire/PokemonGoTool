@@ -1,8 +1,5 @@
 package com.toonwire.pokemongotool;
 
-/**
- * Created by Toonwire on 03-08-2016.
- */
 public class PokemonDataXP {
     private String name;
     private int transfers, evolutions, postEvoTransfers;

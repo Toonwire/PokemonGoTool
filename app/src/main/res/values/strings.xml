@@ -19,10 +19,19 @@
     <string name="pokemon_amount_hint">16</string>
     <string name="transfers">Transfers</string>
     <string name="evolutions">Evolutions</string>
-    <string name="post_evolution_transfers">Post Evolution Transfers</string>
+    <string name="post_evolution_transfers">Evolution Transfers</string>
     <string name="xp">XP</string>
     <string name="tv_row_cp_divider_candy">25 candy</string>
     <string name="tv_row_cp_divider_multiplier">x2.8</string>
+    <string name="experience_optimizer">Experience optimizer</string>
+    <string name="combat_power_calculator">Combat Power calculator</string>
+    <string name="show_your_friends">Show your friends!</string>
+    <string name="share">Share</string>
+    <string name="rate_this_app">Rate this app</string>
+    <string name="cp_min_placeholder">0</string>
+    <string name="cp_range_dash_placeholder">-</string>
+    <string name="cp_max_placeholder">0</string>
+    <string name="xp_placeholder">0</string>
 
 
 </resources>

@@ -1,31 +1,20 @@
 package com.toonwire.pokemongotool;
 
 import android.app.Activity;
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
-/**
- * Created by Toonwire on 05-08-2016.
- */
 public class CombatPowerAdapter extends ArrayAdapter<Object>{
 
     private static final int POKEMON_ROW = 0;
     private static final int INFO_ROW = 1;
     private static final int[] ROW_TYPES = {POKEMON_ROW, INFO_ROW};
-
-
-
-    private Activity context;
-    private int resourceID;
 
     private ArrayList<Object> dataList;
     private LayoutInflater mInflater;
@@ -33,8 +22,6 @@ public class CombatPowerAdapter extends ArrayAdapter<Object>{
 
     public CombatPowerAdapter(Activity context, int resource, ArrayList<Object> items) {
         super(context, resource, items);
-        this.context = context;
-        this.resourceID = resource;
         this.dataList = items;
         this.mInflater = context.getLayoutInflater();
     }
